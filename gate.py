@@ -137,6 +137,7 @@ def p(error):
 
 #########################___SAF___##################################
 def saf(errorx, gate, had):
+    print (errorx)
     w=p(errorx)
     s = 0
     print ("w   :   "+str(w))

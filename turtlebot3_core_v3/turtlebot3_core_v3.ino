@@ -30,9 +30,12 @@
 void setup()
 {
   //Camera Servo init
+  pinMode(9,OUTPUT);
+  pinMode(3,OUTPUT);
+  pinMode(6,OUTPUT);
   cameraPosTiltServo.attach(9);
   cameraPosPanServo.attach(6);
-  gripperServo.attach(11);
+  gripperServo.attach(3);
 
    
   DEBUG_SERIAL.begin(57600);
