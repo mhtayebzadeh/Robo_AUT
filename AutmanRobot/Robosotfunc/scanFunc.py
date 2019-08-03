@@ -22,7 +22,7 @@ def rescale_frame (frame ,hsv, scale):
 
 ##############___COLORS___##########################################
 
-def color(hsv):
+def color(robot ,hsv):
     # hsv[...,2] = hsv[...,2]*0.4
     #################___RED__##############
     # lower_red = np.array([0,45,0])
@@ -127,7 +127,7 @@ def doScan(robot,prefered_color = 'red',time_out=25):
     ang = 0;
     frame, hsv = robot.getFrame(color = "hsv")
     resizedBGR , resizedHSV, scale = rescale_frame(frame ,hsv, 50)
-    red, yellow, blue= color(resizedHSV)
+    red, yellow, blue= color(robot , resizedHSV)
     ball_red = find_circ(resizedHSV, scale, red)
     ball_yellow = find_circ(resizedHSV, scale, yellow)
     ball_blue = find_circ(resizedHSV, scale, blue)
@@ -160,7 +160,7 @@ def doScan(robot,prefered_color = 'red',time_out=25):
         frame, hsv = robot.getFrame(color = "hsv")
         t = time.time()
         resizedBGR , resizedHSV, scale = rescale_frame(frame ,hsv, 50)
-        red, yellow, blue= color(resizedHSV)
+        red, yellow, blue= color(robot , resizedHSV)
 
         ########################################################
         ball_red = find_circ(resizedHSV, scale, red)

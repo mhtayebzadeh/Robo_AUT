@@ -26,52 +26,66 @@ def rescale_frame (frame ,hsv, scale):
     return resizedBGR , resizedHSV, scale
 #####################################################################
 
-########################################
-def RGBY(frame):
-    # split the image into its BGR components
-    kernel = np.ones((5,5),np.float32)/40
-    blur = cv2.blur(frame,(11,11))
-    (B, G, R) = cv2.split(blur)
-    Y= np.uint8(np.around(0.3*R + 0.55*G + 0.11*B))
-    MAX=np.maximum(Y,B)
-    MAX2=np.maximum(Y,G)
-    # MAX3=np.maximum(R,Y)
-    R[R < 1 * MAX] = 0
-    G[G < 1 * MAX] = 0
-    B[B < 1 * MAX2] = 0
+# ########################################
+# def RGBY(frame):
+#     # split the image into its BGR components
+#     kernel = np.ones((5,5),np.float32)/40
+#     blur = cv2.blur(frame,(11,11))
+#     (B, G, R) = cv2.split(blur)
+#     Y= np.uint8(np.around(0.3*R + 0.55*G + 0.11*B))
+#     MAX=np.maximum(Y,B)
+#     MAX2=np.maximum(Y,G)
+#     # MAX3=np.maximum(R,Y)
+#     R[R < 1 * MAX] = 0
+#     G[G < 1 * MAX] = 0
+#     B[B < 1 * MAX2] = 0
    
-    # merge the channels back together and return the image
-    rgby = cv2.merge([B, G, R])
+#     # merge the channels back together and return the image
+#     rgby = cv2.merge([B, G, R])
 
-    return rgby
-#########################################
+#     return rgby
+# #########################################
 
-########################################
-def RGB(frame):
-    # split the image into its BGR components
-    kernel = np.ones((5,5),np.float32)/40
-    blur = cv2.blur(frame,(11,11))
-    (B, G, R) = cv2.split(blur)
+# ########################################
+# def RGB(frame):
+#     # split the image into its BGR components
+#     kernel = np.ones((5,5),np.float32)/40
+#     blur = cv2.blur(frame,(11,11))
+#     (B, G, R) = cv2.split(blur)
     
-    MAX=np.maximum(R,G)
-    MAX2=np.maximum(MAX,B)
-    # MAX3=np.maximum(R,Y)
-    R[R < 1 * MAX2] = 0
-    G[G < 1 * MAX2] = 0
-    B[B < 1 * MAX2] = 0
+#     MAX=np.maximum(R,G)
+#     MAX2=np.maximum(MAX,B)
+#     # MAX3=np.maximum(R,Y)
+#     R[R < 1 * MAX2] = 0
+#     G[G < 1 * MAX2] = 0
+#     B[B < 1 * MAX2] = 0
    
-    # merge the channels back together and return the image
-    rgb = cv2.merge([B, G, R])
+#     # merge the channels back together and return the image
+#     rgb = cv2.merge([B, G, R])
 
-    return rgb
-#########################################
+#     return rgb
+# #########################################
 
 ########################################
-def XYZ(frame):
-    # split the image into its BGR components
-    frame=cv2.cvtColor(frame, cv2.COLOR_BGR2XYZ)
-    kernel = np.ones((5,5),np.float32)/40
-    xyz = cv2.blur(frame,(11,11))
+# def XYZ(frame):
+    # # split the image into its BGR components
+    # frame=cv2.cvtColor(frame, cv2.COLOR_BGR2XYZ)
+    # kernel = np.ones((5,5),np.float32)/40
+    # xyz = cv2.blur(frame,(11,11))
+    # # (B, G, R) = cv2.split(blur)
+    
+    # # MAX=np.maximum(R,G)
+    # # MAX2=np.maximum(MAX,B)
+    # # # MAX3=np.maximum(R,Y)
+    # # R[R < 1 * MAX2] = 0
+    # # G[G < 1 * MAX2] = 0
+    # # B[B < 1 * MAX2] = 0
+   
+    # # merge the channels back together and return the image
+    # # rgby = cv2.merge([B, G, R])
+
+    # return xyz
+#########################################1,11))
     # (B, G, R) = cv2.split(blur)
     
     # MAX=np.maximum(R,G)
@@ -84,13 +98,13 @@ def XYZ(frame):
     # merge the channels back together and return the image
     # rgby = cv2.merge([B, G, R])
 
-    return xyz
+    # return xyz
 #########################################
 
 
 ##############___COLORS___##########################################
 
-def color(robot , rgb,xyz,rgby,hsv):
+def color(robot ,hsv):
 
     lower_blue = robot.lower_blue_ball
     upper_blue = robot.upper_blue_ball
@@ -282,10 +296,10 @@ def doCatchFunc(robot,found_color_,angle,time_out=30):
         
 
         ###___extract_the_needed_colors_mask___###
-        rgb = RGB(resizedBGR)
-        xyz=XYZ(resizedBGR)
-        rgby = RGBY(resizedBGR)
-        red, yellow, blue= color(robot , rgb,xyz,rgby,hsv)
+        # rgb = RGB(resizedBGR)
+        # xyz=XYZ(resizedBGR)
+        # rgby = RGBY(resizedBGR)
+        red, yellow, blue= color(robot ,resizedhsv)
 
         ###___get_the_details_of_each_color___###
         maskDict={"red":red, "yellow":yellow, "blue":blue}
@@ -329,10 +343,10 @@ def doCatchFunc(robot,found_color_,angle,time_out=30):
         resizedBGR , resizedhsv, scale = rescale_frame(frame,hsv, 50)
         
         ###___extract_the_needed_colors_mask___###
-        rgb = RGB(resizedBGR)
-        xyz=XYZ(resizedBGR)
-        rgby = RGBY(resizedBGR)
-        red, yellow, blue= color(robot , rgb,xyz,rgby)
+        # rgb = RGB(resizedBGR)
+        # xyz=XYZ(resizedBGR)
+        # rgby = RGBY(resizedBGR)
+        red, yellow, blue= color(robot ,resizedhsv)
 
         ###___get_the_details_of_each_color___###
         maskDict={"red":red, "yellow":yellow, "blue":blue}
@@ -383,10 +397,10 @@ def doCatchFunc(robot,found_color_,angle,time_out=30):
     time.sleep(1)
     frame, hsv = robot.getFrame(color = "hsv")
     resizedBGR , resizedhsv, scale = rescale_frame(frame,hsv, 50)
-    rgb = RGB(resizedBGR)
-    xyz=XYZ(resizedBGR)
-    rgby = RGBY(resizedBGR)
-    red, yellow, blue= color(robot , rgb,xyz,rgby,hsv)
+    # rgb = RGB(resizedBGR)
+    # xyz=XYZ(resizedBGR)
+    # rgby = RGBY(resizedBGR)
+    red, yellow, blue= color(robot, resizedhsv)
 
     maskDict={"red":red, "yellow":yellow, "blue":blue}
     prefered_mask=maskDict[found_color]
@@ -413,7 +427,7 @@ if __name__ == "__main__":
     robot.printInfo()
     robot.setVelocity(0,0)
     # time.sleep(1)
-    doCatchFunc(robot,"blue",0, time_out=30)
+    doCatchFunc(robot,"yellow",0, time_out=30)
 
     
     
