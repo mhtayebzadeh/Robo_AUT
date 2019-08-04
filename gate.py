@@ -29,9 +29,9 @@ def color(hsv):
     # hsv[...,2]=hsv[...,2]*0.4
     # hsv=cv2.medianBlur(hsv,19)
 
-    (h,s,v) = cv2.split(hsv)
-    s[s<=255]=0
-    hsv = cv2.merge([h,s,v])
+    # (h,s,v) = cv2.split(hsv)
+    # s[s<=255]=0
+    # hsv = cv2.merge([h,s,v])
     
     # #################___RED__##############
     # lower_red = np.array([0,50,0])
@@ -54,8 +54,8 @@ def color(hsv):
     #######################################
 
     ################___YELLOW___###########
-    lower_yellow = np.array([26,0,190])
-    upper_yellow = np.array([61,255,255])
+    lower_yellow = np.array([10,100,124])
+    upper_yellow = np.array([72,255,255])
     #######################################
 
     ################___BLUE___#############
@@ -97,7 +97,7 @@ def find_gate(frame, scale, cc):
     area = 0
     l = 0
     gate=0
-    errorx= 0
+    errorx= 50
     errory= 1000
     offset_errorx=25
     for c in cnts:
@@ -180,8 +180,8 @@ if __name__ == "__main__":
 
 
         x, y, area, l, errorx, errory, gate = find_gate(resizedhsv, scale, prefered_mask)
-        # cv2.imshow("Frame",resizedhsv)
-        # cv2.imshow(prefered_color,prefered_mask)
+        cv2.imshow("Frame",resizedhsv)
+        cv2.imshow(prefered_color,prefered_mask)
 
         k=cv2.waitKey(1) & 0xFF
         print ("While 1")
@@ -209,8 +209,8 @@ if __name__ == "__main__":
         dict={"red":red, "yellow":yellow, "blue":blue}
         prefered_mask=dict[prefered_color]
 
-        # cv2.imshow("Frame",resizedhsv)
-        # cv2.imshow(prefered_color,prefered_mask)
+        cv2.imshow("Frame",resizedhsv)
+        cv2.imshow(prefered_color,prefered_mask)
 
         k=cv2.waitKey(1) & 0xFF
         
@@ -225,11 +225,14 @@ if __name__ == "__main__":
             
 
         print ("Area   :   " + str (area) + "     gate :   " + str(gate))
-        if area > 50000 and gate == 1 or k==27:
-            time.sleep(2.5)
-            robot.setGripper(0)
+        if area > 30000 and gate == 1 or k==27:
+            time.sleep(1.5)
+            robot.setGripper(20)
             time.sleep(1)
+            robot.setVelocity(-0.03 ,0)
+            time.sleep(5)
             robot.setVelocity(0,0)
+            print "finish"
             break
 
  
