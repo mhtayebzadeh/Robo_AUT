@@ -83,6 +83,7 @@ class TB3:
         try:
             for i in range(10):
                 self.setVelocity(0,0)
+            self.resetRobot()
             self.cap.release()
             print("camera released ...")
             cv2.destroyAllWindows()
@@ -112,7 +113,7 @@ class TB3:
 
     def resetRobot(self):
         self.resetPub = rospy.Publisher('reset', Empty, queue_size=10)
-        for i in range(2):
+        for i in range(1):
             msg = Empty()
             self.resetPub.publish(msg)
             time.sleep(0.1)
@@ -225,9 +226,26 @@ class TB3:
         # TODO: 
         pass
 
-    def loadParameter():
-        pass
-        # TODO: 
+    def loadParameter(self):
+        hmin,hmax,smin,smax,vmin,vmax = 0,0,0,0,0,0
+        with open ('./color/red.pickle','rb') as tuned_param:
+            # red=[hmin,hmax,smin,smax,vmin,vmax]
+            red=pickle.load(tuned_param)
+            [hmin,hmax,smin,smax,vmin,vmax]=red
+            self.lower_red1_ball = [hmin , smin , vmin]
+            self.upper_red1_ball = [hmax, smax, vmax]
+        with open ('./color/blue.pickle','rb') as tuned_param:
+            blue=[hmin,hmax,smin,smax,vmin,vmax]
+            blue=pickle.load(tuned_param)
+            [hmin,hmax,smin,smax,vmin,vmax]=blue
+            self.lower_blue_ball = [hmin , smin , vmin]
+            self.upper_blue_ball = [hmax, smax, vmax]
+        with open ('./color/yellow.pickle','rb') as tuned_param:
+            yellow=[hmin,hmax,smin,smax,vmin,vmax]
+            yellow=pickle.load(tuned_param)
+            [hmin,hmax,smin,smax,vmin,vmax]=yellow
+            self.lower_yellow_ball = [hmin , smin , vmin]
+            self.upper_yellow_ball = [hmax, smax, vmax]
 
     def getOdometry(self):
         '''

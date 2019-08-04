@@ -66,11 +66,11 @@ if __name__ == "__main__":
     robot.init_node()
     robot.printInfo()
     time.sleep(0.5)
-    robot.resetRobot()
-    time.sleep(5)
-
+    # robot.resetRobot()
+    # time.sleep(5)
     robot.setVelocity(0,0)    
     robot.setGripper(0)
     time.sleep(1)
     start_states(robot)
     robot.setVelocity(0,0) 
+    # del robot
