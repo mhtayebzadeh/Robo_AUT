@@ -15,7 +15,8 @@ import numpy.linalg as la
 from std_msgs.msg import Float32 , Int32 , Empty
 
 def obstacleAvoidance(robot , pos_d_ = [1,1],time_out = 45 , isGoal = False):
-        
+    robot.setCameraPos(150,80)
+    time.sleep(0.2)
     pos_d = pos_d_
     dist_goal = 100
     robot.setRobotTime(0)

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
+import pickle
 from std_msgs.msg import Float32 , Int32 , Empty , String
 from geometry_msgs.msg import Twist
 import sys, select, termios, tty
@@ -228,24 +229,24 @@ class TB3:
 
     def loadParameter(self):
         hmin,hmax,smin,smax,vmin,vmax = 0,0,0,0,0,0
-        with open ('./color/red.pickle','rb') as tuned_param:
+        with open ('./AutmanRobot/color/red.pickle','rb') as tuned_param:
             # red=[hmin,hmax,smin,smax,vmin,vmax]
             red=pickle.load(tuned_param)
             [hmin,hmax,smin,smax,vmin,vmax]=red
-            self.lower_red1_ball = [hmin , smin , vmin]
-            self.upper_red1_ball = [hmax, smax, vmax]
-        with open ('./color/blue.pickle','rb') as tuned_param:
+            self.lower_red1_ball = np.array([hmin , smin , vmin])
+            self.upper_red1_ball = np.array([hmax, smax, vmax])
+        with open ('./AutmanRobot/color/blue.pickle','rb') as tuned_param:
             blue=[hmin,hmax,smin,smax,vmin,vmax]
             blue=pickle.load(tuned_param)
             [hmin,hmax,smin,smax,vmin,vmax]=blue
-            self.lower_blue_ball = [hmin , smin , vmin]
-            self.upper_blue_ball = [hmax, smax, vmax]
-        with open ('./color/yellow.pickle','rb') as tuned_param:
+            self.lower_blue_ball = np.array([hmin , smin , vmin])
+            self.upper_blue_ball = np.array([hmax, smax, vmax])
+        with open ('./AutmanRobot/color/yellow.pickle','rb') as tuned_param:
             yellow=[hmin,hmax,smin,smax,vmin,vmax]
             yellow=pickle.load(tuned_param)
             [hmin,hmax,smin,smax,vmin,vmax]=yellow
-            self.lower_yellow_ball = [hmin , smin , vmin]
-            self.upper_yellow_ball = [hmax, smax, vmax]
+            self.lower_yellow_ball = np.array([hmin , smin , vmin])
+            self.upper_yellow_ball = np.array([hmax, smax, vmax])
 
     def getOdometry(self):
         '''
