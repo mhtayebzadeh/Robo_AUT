@@ -12,6 +12,23 @@ import numpy.linalg as la
 import math
 from operator import xor
 
+######################___FPS___######################################
+_tick2_frame=0
+_tick2_fps=20000000 # real raw FPS
+_tick2_t0=time.time()
+
+def tick(fps=240):
+    global _tick2_frame,_tick2_fps,_tick2_t0
+    n=_tick2_fps/fps
+    _tick2_frame+=n
+    while n>0: 
+        n-=1
+        if time.time()-_tick2_t0>1:
+            _tick2_t0=time.time()
+            _tick2_fps=_tick2_frame
+            _tick2_frame=0
+
+#####################################################################
 ######################____RESCALE_FRAME___###########################
 def rescale_frame (frame, hsv, scale):
     width = int(frame.shape[1] * scale/100)
@@ -49,8 +66,8 @@ def color(hsv):
     # #######################################
 
     #################___RED__##############
-    lower_red = np.array([0,0,200])
-    upper_red = np.array([45,255,255])
+    lower_red = np.array([0,185,200])
+    upper_red = np.array([10,255,255])
     #######################################
 
     ################___YELLOW___###########
@@ -59,8 +76,8 @@ def color(hsv):
     #######################################
 
     ################___BLUE___#############
-    lower_blue = np.array([80,0,255])
-    upper_blue = np.array([255,255,255])
+    lower_blue = np.array([103,0,0])
+    upper_blue = np.array([118,255,255])
     #######################################
 
 
@@ -81,9 +98,9 @@ def color(hsv):
     # mask_yellow = cv2.bitwise_not(maskyy)
 
     mask_blue = cv2.inRange(hsv, lower_blue, upper_blue)
-    # maskb = cv2.bitwise_not(mask_b)
-    # maskbb = cv2.erode(maskb, None, iterations=1)
-    # mask_blue = cv2.bitwise_not(maskbb)
+    maskb = cv2.bitwise_not(mask_blue)
+    mask_bb = cv2.erode(maskb, None, iterations=1)
+    mask_blue = cv2.bitwise_not(mask_bb)
     
 
     return  mask_red, mask_yellow, mask_blue
@@ -145,7 +162,7 @@ def saf(errorx, gate, had):
         s=0
         ang= 0.8*w
         robot.setVelocity(0,ang)
-        time.sleep(0.005) 
+        # time.sleep(0.005) 
     else :
         w = 0  
         s=1
@@ -163,6 +180,8 @@ if __name__ == "__main__":
     prefered_color="yellow"
 
     while (True):
+        tick(120)
+        print ("FPS               ******************               "+str(_tick2_fps))
         t1=time.time()
 
         ###___getting_frames_from_webcam___###
@@ -193,15 +212,22 @@ if __name__ == "__main__":
        
         if s == 1 and gate==1 or k==27:
             robot.setVelocity(0 ,0)
+            robot.setCameraPos(offset_pan,40)
+            time.sleep(0.1)
+            robot.getFrame()
             break
 
     
-    time.sleep(1)
+    time.sleep(0.1)
     robot.getFrame()
+    tick(120)
+    time.sleep(0.2)
 
     while (True):
+        tick(120)
+        print ("FPS               ******************               "+str(_tick2_fps))
         robot.setVelocity(0.05,0)
-        time.sleep(0.06)
+        # time.sleep(0.06)
         frame, hsv = robot.getFrame(color = "hsv")
         resizedBGR , resizedhsv, scale = rescale_frame(frame,hsv, 50)
         red, yellow, blue= color(resizedhsv)
@@ -209,8 +235,6 @@ if __name__ == "__main__":
         dict={"red":red, "yellow":yellow, "blue":blue}
         prefered_mask=dict[prefered_color]
 
-        cv2.imshow("Frame",resizedhsv)
-        cv2.imshow(prefered_color,prefered_mask)
 
         k=cv2.waitKey(1) & 0xFF
         
@@ -218,17 +242,20 @@ if __name__ == "__main__":
         
         print("while 2   :::::::::::::::     "+ str(errory))
 
-        s = saf(errorx, gate, 0.1)
+        s = saf(errorx, gate, 0.3)
 
-        if abs(errory) < 100:
-            robot.setCameraPos(offset_pan,30)
-            
+        # if abs(errory) < 100:
+        #     robot.setCameraPos(offset_pan,30)
+
+        cv2.imshow("Frame",resizedhsv)
+        cv2.imshow(prefered_color,prefered_mask)
+     
 
         print ("Area   :   " + str (area) + "     gate :   " + str(gate))
-        if area > 30000 and gate == 1 or k==27:
+        if area > 30000 and gate == 1 and s==1 or k==27:
             time.sleep(1.5)
             robot.setGripper(20)
-            time.sleep(1)
+            time.sleep(2.5)
             robot.setVelocity(-0.03 ,0)
             time.sleep(5)
             robot.setVelocity(0,0)
