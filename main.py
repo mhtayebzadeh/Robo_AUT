@@ -65,12 +65,14 @@ if __name__ == "__main__":
     robot = TurtleBot.TB3("tayeb",[0,1,2])
     robot.init_node()
     robot.printInfo()
+    robot.loadParameter()
+    print(robot.lower_yellow_ball)
     time.sleep(0.5)
-    robot.resetRobot()
-    time.sleep(5)
-
+    # robot.resetRobot()
+    # time.sleep(5)
     robot.setVelocity(0,0)    
     robot.setGripper(0)
     time.sleep(1)
     start_states(robot)
     robot.setVelocity(0,0) 
+    # del robot
