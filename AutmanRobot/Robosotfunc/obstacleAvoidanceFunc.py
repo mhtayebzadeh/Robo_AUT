@@ -15,6 +15,7 @@ import numpy.linalg as la
 from std_msgs.msg import Float32 , Int32 , Empty
 
 def obstacleAvoidance(robot , pos_d_ = [1,1],time_out = 45 , isGoal = False):
+    robot.setGripper(40)
     robot.setCameraPos(150,80)
     time.sleep(0.2)
     pos_d = pos_d_
@@ -32,9 +33,9 @@ def obstacleAvoidance(robot , pos_d_ = [1,1],time_out = 45 , isGoal = False):
         diff = pos_d - pos
         dist = la.norm(diff) + 0.0001
         dist_goal = float(dist)
-        F_goal = (diff/dist) * (Q_goal/((dist - 0.1)**2))
+        F_goal = (diff/dist) * (Q_goal/((dist - 0.17)**2))
 
-        obstacles = robot.getObstacles(minRange = 0.1 , maxRange = 0.44 , minAngle = 300 , maxAngle = 60)
+        obstacles = robot.getObstacles(minRange = 0.05 , maxRange = 0.65 , minAngle = 280 , maxAngle = 80)
         # obstacles = robot.getObstacles(minRange = 0.1 , maxRange = 0.44 , minAngle = 275 , maxAngle = 85)
 
         N_obs = len(obstacles)
@@ -45,15 +46,16 @@ def obstacleAvoidance(robot , pos_d_ = [1,1],time_out = 45 , isGoal = False):
         front_obstacles = 0
 
         for obs in obstacles:
-            # coef = 1
+            coef = 1
             theta = obs[0]
             diff = np.array([obs[1] * np.cos(theta*np.pi/180 + phi) , obs[1] * np.sin(theta*np.pi/180 + phi)])
             dist = obs[1]
-            if dist < 0.2 and (theta > 310  or theta < 40):
+            if dist < 0.30 and (theta > 315  or theta < 45):
                 front_obstacles += 1
-            # if dist > .45 and dist <.66 :
-            #     coef = 0.2
-            F = - (diff/dist) * (Q_tatal_obstacles/((dist - 0.15)**2))
+            if dist > 0.45 and dist < 0.66 :
+                coef = 0.2
+            
+            F = - (diff/dist) * (Q_tatal_obstacles/((dist - 0.17)**2))*coef
             F_obs += F
 
             # if (isGoal == False):
@@ -99,14 +101,17 @@ def obstacleAvoidance(robot , pos_d_ = [1,1],time_out = 45 , isGoal = False):
         if front_obstacles > 1:
             v = 0.0
 
+        if abs(v) < 0.015 and abs(w) <= 0.1 :
+            w = 0.1 * np.sign(w)
+
         
         robot.setVelocity(v , w)
-        time.sleep(0.05)
+        time.sleep(0.03)
         if dist_goal <= 0.1:
             return "arrived"
 
     if dist_goal <= 0.1:
-            return "arrived"
+        return "arrived"
     return "fail"
 
 if __name__ == "__main__":
@@ -117,7 +122,7 @@ if __name__ == "__main__":
     robot.setVelocity(0,0)    
     robot.setGripper(0)
 
-    obstacleAvoidance(robot , [1,1])
+    obstacleAvoidance(robot , [1,0])
     #obstacleAvoidance(robot , [1,0])
     # obstacleAvoidance(robot , [2,1])
     # obstacleAvoidance(robot , [2.7,0])
