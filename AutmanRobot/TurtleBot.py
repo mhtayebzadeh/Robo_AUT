@@ -16,6 +16,7 @@ import threading
 import numpy as np
 import numpy.linalg as la
 from .Field import Field
+import copy
 
 class TB3:
     robot_namespace = ""
@@ -58,8 +59,8 @@ class TB3:
     lower_red2_ball = np.array([0 , 51 , 0])
     upper_red2_ball = np.array([5 , 225 ,255])
 
-    lower_yellow_ball = np.array([21 , 68 , 120])
-    upper_yellow_ball = np.array([45 , 225 ,255])
+    lower_yellow_ball = np.array([12 , 0 , 0])
+    upper_yellow_ball = np.array([45 , 255 ,255])
 
     def __init__(self, name, cameraID , namespace = ""):
         print("robot init ...")
@@ -280,15 +281,22 @@ class TB3:
     def getCameraPos():
         return self.camera_pos_pan , self.camera_pos_tilt
 
-    def setGripper(self, status):
+    def setGripper(self, status , time_ = 0):
         '''
         status = 100 ==> Gripper completely close
         status = 0 ==> Gripper completely open
         '''
+        lastStatus = copy.copy(self.gripper)
         msg = Int32()
-        msg.data = int(status)
-        self.gripper = status
-        self.gripperPub.publish(msg)
+        d = int(status - lastStatus)
+        if d == 0:
+            d = 1;
+        dt = time_/abs(d)
+        for i in range(abs(d)):
+            self.gripper = np.sign(d) + self.gripper
+            msg.data = int(self.gripper)
+            self.gripperPub.publish(msg)
+            time.sleep(dt)
         
     def vec_ang(self ,v1, v2):
         """ Returns the angle in radians between vectors 'v1' and 'v2'    """

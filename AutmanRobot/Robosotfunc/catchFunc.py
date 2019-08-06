@@ -182,10 +182,11 @@ def find_circ(frame, scale, cc):
         # cY = int(((M["m01"] + 0.00001 )/( M["m00"] + 0.00001)) / scale)
         # # c = c.astype("float")
         # c = c.astype("int")
-        appr = cv2.approxPolyDP(c, 0.01 * cv2.arcLength(c, True),True)
-        if len(appr) >= 10 and len(appr)<=25:
+        appr = cv2.approxPolyDP(c, 0.005 * cv2.arcLength(c, True),True)
+        if len(appr) >= 10 and len(appr)<=35:
             area = cv2.contourArea(c)
-            if area >= 300 and area <= 24000:
+            print("aprr , area = " , appr , area)
+            if area >= 300 and area <= 34000:
                 # c = sorted(cnts, key=cv2.contourArea, reverse=True)[0]
                 (x, y), raduis= cv2.minEnclosingCircle(c)
                 center = (int(x), int(y))
@@ -319,19 +320,24 @@ def doCatchFunc(robot,found_color_,angle,time_out=30):
         if s == 1 and ball==1:
             s=saf(robot , errorx, ball, 0.01)
             robot.setVelocity(0 ,0)
-            robot.setCameraPos(offset_pan,20)
+            robot.setCameraPos(offset_pan,10)
             time.sleep(0.1)
             robot.getFrame()
             break
 
         t2=time.time()
 
-    time.sleep(0.1)
+    time.sleep(1)
+    robot.getFrame()
+    robot.getFrame()
+    robot.getFrame()
+    robot.getFrame()
     robot.getFrame()
     time.sleep(0.2)
     cnt = 0
 
     linVel = 0.05
+    ballFlag = 0
     while (rospy.get_time() - init_time < time_out):
         robot.setVelocity(linVel,0)
         # time.sleep(0.001)
@@ -354,23 +360,37 @@ def doCatchFunc(robot,found_color_,angle,time_out=30):
         x, y, errorx, errory, gate, ball, area , radius = find_circ(resizedBGR, scale, prefered_mask)
 
         s = saf(robot , errorx, ball, 0.2)
-        if y > 50 and ball==1:
+        if y > 40 and ball==1 and ballFlag == 0:
             linVel = 0.03
-            robot.setGripper(0)
+            robot.setVelocity(0,0)
+            time.sleep(0.3)
+            s = 0
+            while s == 0:
+                frame, hsv = robot.getFrame(color = "hsv")
+                resizedBGR , resizedhsv, scale = rescale_frame(frame,hsv, 50)
+                red, yellow, blue= color(robot ,resizedhsv)
+                maskDict={"red":red, "yellow":yellow, "blue":blue}
+                prefered_mask=maskDict[found_color]
+                x, y, errorx, errory, gate, ball, area , radius = find_circ(resizedBGR, scale, prefered_mask)
+                s = saf(robot , errorx, ball, 0.05)
+
+            robot.setGripper(0,2)
             robot.setVelocity(linVel,0)
             print ("Seee Seee Seee")
+            ballFlag = 1
+
             
         # print("while 2")
-        s = saf(robot , errorx, ball, 0.06)
+        # s = saf(robot , errorx, ball, 0.06)
         
         cv2.imshow("Frame",resizedhsv)
         cv2.imshow(found_color,prefered_mask)
         k=cv2.waitKey(1) & 0xFF
 
         print("y = ",y)
-        if ball == 1 and y >= 100 and s==1:
+        if ball == 1 and y >= 90 and s==1:
             cnt = cnt + 1
-            if cnt > 4:
+            if cnt > 0:
                 robot.setVelocity(0.06,0)
                 time.sleep(0.6)
                 # robot.setGripper(20)
@@ -395,7 +415,8 @@ def doCatchFunc(robot,found_color_,angle,time_out=30):
 
     robot.setCameraPos(offset_pan,20)
     time.sleep(1)
-    frame, hsv = robot.getFrame(color = "hsv")
+    for gh in range(20):
+        frame, hsv = robot.getFrame(color = "hsv")
     resizedBGR , resizedhsv, scale = rescale_frame(frame,hsv, 50)
     # rgb = RGB(resizedBGR)
     # xyz=XYZ(resizedBGR)
@@ -405,8 +426,11 @@ def doCatchFunc(robot,found_color_,angle,time_out=30):
     maskDict={"red":red, "yellow":yellow, "blue":blue}
     prefered_mask=maskDict[found_color]
     x, y, errorx, errory, gate, ball, area , radius = find_circ(resizedBGR, scale, prefered_mask)
-    s = saf(robot , errorx, ball, 0.06)
-    if ball == 1 and y >= 150 and s == 1:
+    # s = saf(robot , errorx, ball, 0.06)
+    print (ball)
+    print (y)
+    print (s)
+    if ball == 1 and y >= 150 :
         t6 =time.time()
         print("YEEEEEESSSSSSSSS")
         return 'catched'

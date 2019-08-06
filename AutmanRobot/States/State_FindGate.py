@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from AutmanRobot.Robosotfunc.gateFunc import *
 import rospy
 import smach
 import time
@@ -14,7 +15,7 @@ class FindGate(smach.State):
         print('Executing state FindGate')
         self.robot.setVelocity(0,0)
         time.sleep(0.1)
-
-        ##
-        
+        result = doGateFunc(self.robot ,self.robot.find_ball_color)
+        if result == "ok":
+            return "ok"
         return 'fail'
