@@ -50,17 +50,17 @@ class TB3:
     find_ball_color = None
     find_ball_phi = None
 
-    lower_blue_ball = np.array([87 , 137 , 99])
-    upper_blue_ball = np.array([112 , 225 ,255])
+    lower_blue_ball = np.array([0 , 157 , 110])
+    upper_blue_ball = np.array([104 , 255 ,255])
 
     lower_red1_ball = np.array([160 , 145 , 0])
     upper_red1_ball = np.array([200 , 225 ,255])
 
-    lower_red2_ball = np.array([0 , 51 , 0])
-    upper_red2_ball = np.array([5 , 225 ,255])
+    lower_red2_ball = np.array([0 , 148 , 116])
+    upper_red2_ball = np.array([255 , 255 ,227])
 
-    lower_yellow_ball = np.array([12 , 0 , 0])
-    upper_yellow_ball = np.array([45 , 255 ,255])
+    lower_yellow_ball = np.array([0 , 0 , 0])
+    upper_yellow_ball = np.array([68 , 236 ,255])
 
     def __init__(self, name, cameraID , namespace = ""):
         print("robot init ...")

@@ -36,8 +36,8 @@ while(1):
         blue=pickle.load(tuned_param)
         [hmin,hmax,smin,smax,vmin,vmax]=blue
     with open ('yellow.pickle','rb') as tuned_param:
-        blue=[hmin,hmax,smin,smax,vmin,vmax]
-        blue=pickle.load(tuned_param)
+        yellow=[hmin,hmax,smin,smax,vmin,vmax]
+        yellow=pickle.load(tuned_param)
         [hmin,hmax,smin,smax,vmin,vmax]=yellow
     # define range of blue color in HSV
     lower_blue = np.array([hmin, smin, vmin])

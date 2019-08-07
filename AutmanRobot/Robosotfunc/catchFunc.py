@@ -14,7 +14,23 @@ import numpy.linalg as la
 import math
 from operator import xor
 import sys
+######################___FPS___######################################
+_tick2_frame=0
+_tick2_fps=20000000 # real raw FPS
+_tick2_t0=time.time()
 
+def tick(fps=120):
+    global _tick2_frame,_tick2_fps,_tick2_t0
+    n=_tick2_fps/fps
+    _tick2_frame+=n
+    while n>0: 
+        n-=1
+        if time.time()-_tick2_t0>1:
+            _tick2_t0=time.time()
+            _tick2_fps=_tick2_frame
+            _tick2_frame=0
+
+#####################################################################
 ######################____RESCALE_FRAME___###########################
 def rescale_frame (frame ,hsv, scale):
     hsv = cv2.blur(hsv,(11,11))
@@ -161,13 +177,13 @@ def find_circ(frame, scale, cc):
     _, cnts, _ = cv2.findContours(cc, cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
     x=0
     y=0
-    errorx=0
+    errorx=50
     errory=0
     gate =1
     ball=0
     area = 0
     radius = 0
-    offset_errorx=20
+    offset_errorx=0
     cnts_sort = sorted(cnts, key=cv2.contourArea, reverse=True)
     if len(cnts_sort) > 2 :
         cnts = cnts_sort[0:1]
@@ -287,6 +303,8 @@ def doCatchFunc(robot,found_color_,angle,time_out=30):
     first_time =  0
 
     while (rospy.get_time() - init_time < time_out):
+        tick(120)
+        print ("FPS               ******************               "+str(_tick2_fps))
         t1=time.time()
 
         ###___getting_frames_from_webcam___###
@@ -312,7 +330,7 @@ def doCatchFunc(robot,found_color_,angle,time_out=30):
 
         s = saf(robot ,errorx, ball, 0.03)
         # print ("area :      "+str(vv))
-        cv2.imshow("Frame",resizedhsv)
+        # cv2.imshow("Frame",resizedBGR)
         cv2.imshow(found_color,prefered_mask)
         
         k=cv2.waitKey(1) & 0xFF
@@ -339,6 +357,8 @@ def doCatchFunc(robot,found_color_,angle,time_out=30):
     linVel = 0.05
     ballFlag = 0
     while (rospy.get_time() - init_time < time_out):
+        tick(120)
+        print ("FPS               ******************               "+str(_tick2_fps))
         robot.setVelocity(linVel,0)
         # time.sleep(0.001)
 
@@ -360,12 +380,14 @@ def doCatchFunc(robot,found_color_,angle,time_out=30):
         x, y, errorx, errory, gate, ball, area , radius = find_circ(resizedBGR, scale, prefered_mask)
 
         s = saf(robot , errorx, ball, 0.2)
-        if y > 40 and ball==1 and ballFlag == 0:
+        if y > 30 and ball==1 and ballFlag == 0:
             linVel = 0.03
             robot.setVelocity(0,0)
             time.sleep(0.3)
             s = 0
             while s == 0:
+                tick(120)
+                print ("FPS               ******************               "+str(_tick2_fps))
                 frame, hsv = robot.getFrame(color = "hsv")
                 resizedBGR , resizedhsv, scale = rescale_frame(frame,hsv, 50)
                 red, yellow, blue= color(robot ,resizedhsv)
@@ -383,7 +405,7 @@ def doCatchFunc(robot,found_color_,angle,time_out=30):
         # print("while 2")
         # s = saf(robot , errorx, ball, 0.06)
         
-        cv2.imshow("Frame",resizedhsv)
+        # cv2.imshow("Frame",resizedBGR)
         cv2.imshow(found_color,prefered_mask)
         k=cv2.waitKey(1) & 0xFF
 
@@ -416,6 +438,8 @@ def doCatchFunc(robot,found_color_,angle,time_out=30):
     robot.setCameraPos(offset_pan,20)
     time.sleep(1)
     for gh in range(20):
+        tick(120)
+        print ("FPS               ******************               "+str(_tick2_fps))
         frame, hsv = robot.getFrame(color = "hsv")
     resizedBGR , resizedhsv, scale = rescale_frame(frame,hsv, 50)
     # rgb = RGB(resizedBGR)
@@ -429,8 +453,8 @@ def doCatchFunc(robot,found_color_,angle,time_out=30):
     # s = saf(robot , errorx, ball, 0.06)
     print (ball)
     print (y)
-    print (s)
-    if ball == 1 and y >= 150 :
+    #print (s)
+    if ball == 1 and y >= 100 :
         t6 =time.time()
         print("YEEEEEESSSSSSSSS")
         return 'catched'
@@ -451,7 +475,7 @@ if __name__ == "__main__":
     robot.printInfo()
     robot.setVelocity(0,0)
     # time.sleep(1)
-    doCatchFunc(robot,"yellow",0, time_out=30)
+    doCatchFunc(robot,"red",0, time_out=30)
 
     
     

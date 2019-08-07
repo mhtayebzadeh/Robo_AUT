@@ -72,14 +72,16 @@ while(1):
     dim = (width, height)
     resizedBGR = cv2.resize(frame, dim, interpolation =cv2.INTER_AREA)
     hsv = cv2.cvtColor(resizedBGR, cv2.COLOR_BGR2HSV)
+    hsv = cv2.blur(hsv,(11,11))
     ##########################################3
     lower_range = np.array([hmin, smin, vmin])
     upper_range = np.array([hmax, smax, vmax])
     mask = cv2.inRange(hsv, lower_range, upper_range)
     
-    cv2.waitKey(1)
+    k=cv2.waitKey(1) & 0xFF
     cv2.imshow("image",img)
     cv2.imshow("mask",mask)
-
+    if k==27:
+        break
 cap.release()
-cv2destroyAllWindows()    
+cv2.destroyAllWindows()    

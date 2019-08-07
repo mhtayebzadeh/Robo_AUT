@@ -50,7 +50,7 @@ def start_states(robot):
                                             'fail':'GoToNextGoal'})
 
         smach.StateMachine.add('FindGate', FindGate(robot),
-                                transitions={'ok':'FindNextPoint',
+                                transitions={'released':'FindNextPoint',
                                             'fail':'GoToNextGoal'})
 
         smach.StateMachine.add('GoToNextGoal', GoToNextGoal(robot),
