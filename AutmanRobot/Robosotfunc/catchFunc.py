@@ -33,7 +33,7 @@ def tick(fps=120):
 #####################################################################
 ######################____RESCALE_FRAME___###########################
 def rescale_frame (frame ,hsv, scale):
-    hsv = cv2.blur(hsv,(11,11))
+    # hsv = cv2.blur(hsv,(11,11))
     width = int(frame.shape[1] * scale/100)
     height = int(frame.shape[0] * scale/100)
     dim = (width, height)
@@ -146,10 +146,10 @@ def color(robot ,hsv):
     # mask_red = cv2.inRange(rgb, lower_red, upper_red)
     mask_red1 = cv2.inRange(hsv , lower_red1, upper_red1)
     mask_red2 = cv2.inRange(hsv , lower_red2, upper_red2)
-    # maskr = cv2.bitwise_not(mask_red)
-    # maskrr = cv2.erode(maskr, None, iterations=2)
-    # mask_red = cv2.bitwise_not(maskrr)
     mask_red = cv2.bitwise_or(mask_red2,mask_red1)
+    maskr = cv2.bitwise_not(mask_red)
+    maskrr = cv2.erode(maskr, None, iterations=2)
+    mask_red = cv2.bitwise_not(maskrr)
 
     # mask_yellow = cv2.inRange(rgby, lower_yellow, upper_yellow)
     mask_yellow = cv2.inRange(hsv, lower_yellow, upper_yellow)
@@ -379,7 +379,7 @@ def doCatchFunc(robot,found_color_,angle,time_out=30):
         prefered_mask=maskDict[found_color]
         x, y, errorx, errory, gate, ball, area , radius = find_circ(resizedBGR, scale, prefered_mask)
 
-        s = saf(robot , errorx, ball, 0.2)
+        s = saf(robot , errorx, ball, 0.4)
         if y > 30 and ball==1 and ballFlag == 0:
             linVel = 0.03
             robot.setVelocity(0,0)

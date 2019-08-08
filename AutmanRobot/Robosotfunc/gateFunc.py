@@ -1,5 +1,3 @@
-# from AutmanRobot.States.State_FindBall import FindBall
-# from AutmanRobot.States.State_ObstaceAvoidance import ObstaceAvoidance
 import sys
 sys.path.insert(0, '../..')
 
@@ -34,8 +32,8 @@ def tick(fps=240):
 #####################################################################
 ######################____RESCALE_FRAME___###########################
 def rescale_frame (frame, hsv, scale):
-    hsv = cv2.blur(hsv,(11,11))
-    frame = cv2.blur(frame,(11,11))
+    # hsv = cv2.blur(hsv,(11,11))
+    # frame = cv2.blur(frame,(11,11))
     width = int(frame.shape[1] * scale/100)
     height = int(frame.shape[0] * scale/100)
     dim = (width, height)
@@ -47,7 +45,7 @@ def rescale_frame (frame, hsv, scale):
 
 
 #####################___COLOR___###########################################################
-def color(frame,hsv):
+def color(robot , frame,hsv):
     # hsv[...,2]=hsv[...,2]*0.4
     # hsv=cv2.medianBlur(hsv,19)
 
@@ -71,18 +69,20 @@ def color(frame,hsv):
     # #######################################
 
     #################___RED__##############
-    lower_red = np.array([0,0,138])
-    upper_red = np.array([103,115,196])
+    lower_red1 = robot.lower_red1_ball
+    upper_red1 = robot.upper_red1_ball
+    lower_red2 = robot.lower_red2_ball
+    upper_red2 = robot.upper_red2_ball
     #######################################
 
     ################___YELLOW___###########
-    lower_yellow = np.array([0,0,195])
-    upper_yellow = np.array([67,172,255])
+    lower_yellow = robot.lower_yellow_ball
+    upper_yellow = robot.upper_yellow_ball
     #######################################
 
     ################___BLUE___#############
-    lower_blue = np.array([95,150,0])
-    upper_blue = np.array([120,255,255])
+    lower_blue = robot.lower_blue_ball
+    upper_blue = robot.upper_blue_ball
     #######################################
 
 
@@ -92,7 +92,10 @@ def color(frame,hsv):
 
     ##########___MASK___##########
     
-    mask_red = cv2.inRange(frame, lower_red, upper_red)
+    mask_red1 = cv2.inRange(hsv, lower_red1, upper_red1)
+    mask_red2 = cv2.inRange(hsv, lower_red2, upper_red2)
+    mask_red = cv2.bitwise_or(mask_red1 , mask_red2)
+
     # maskr = cv2.bitwise_not(mask_r)
     # maskrr = cv2.erode(maskr, None, iterations=1)
     # mask_red = cv2.bitwise_not(maskrr)
@@ -181,7 +184,8 @@ def doGateFunc(robot , foundColor ):
     offset_pan=105
     robot.setCameraPos(offset_pan,teta)
     prefered_color = foundColor
-
+    robot.setGripper(40)
+    cnt = 0
     while (True):
         tick(120)
         print ("FPS               ******************               "+str(_tick2_fps))
@@ -194,7 +198,7 @@ def doGateFunc(robot , foundColor ):
         resizedBGR, resizedhsv, scale = rescale_frame(frame, hsv, 50)
 
         ###___extract_the_needed_colors_mask___###
-        red, yellow, blue= color(resizedBGR,resizedhsv)
+        red, yellow, blue= color(robot ,resizedBGR,resizedhsv)
 
         ###___get_the_details_of_each_color___###
         dict={"red":red, "yellow":yellow, "blue":blue}
@@ -208,7 +212,16 @@ def doGateFunc(robot , foundColor ):
         k=cv2.waitKey(1) & 0xFF
         print ("While 1")
         print("errorx  &&&&&&&&&&&&&&&&&&&& $$$$$$$$$$$$$  "+str(errorx))
-        s = saf(robot,errorx, gate, 0.04)
+        s = 0
+        if gate == 1:
+            cnt = 5
+        else:
+            cnt -= 1
+        
+        if cnt > 0:
+            s = saf(robot,errorx, gate, 0.04)
+        else :
+            robot.setVelocity(0,-0.6)
 
         t2=time.time()
 
@@ -234,7 +247,7 @@ def doGateFunc(robot , foundColor ):
         # time.sleep(0.06)
         frame, hsv = robot.getFrame(color = "hsv")
         resizedBGR , resizedhsv, scale = rescale_frame(frame,hsv, 50)
-        red, yellow, blue= color(resizedBGR,resizedhsv)
+        red, yellow, blue= color(robot , resizedBGR,resizedhsv)
 
         dict={"red":red, "yellow":yellow, "blue":blue}
         prefered_mask=dict[prefered_color]
@@ -256,15 +269,41 @@ def doGateFunc(robot , foundColor ):
      
 
         print ("Area   :   " + str (area) + "     gate :   " + str(gate))
-        if b+d>40 and area > 20000 and gate == 1 and s==1:
-            time.sleep(2)
-            robot.setGripper(20)
+        # if b+d>100 and area > 20000 and gate == 1 and s==1:
+        if abs(errory)<5 and area > 20000 and gate == 1 and s==1:
+            time.sleep(1.8)
             robot.setVelocity(0 ,0)
-            time.sleep(2)
-            robot.setVelocity(-0.03 ,0)
-            time.sleep(5)
+            time.sleep(0.2)
+            ############ khodet ro saaf kon ;) ###################
+            time_out = 2
+            init_time = rospy.get_time();
+            ####__ANGLE___####
+            while (rospy.get_time() - init_time < time_out):
+                imu = robot.getOdometry()
+                phi = imu[2]
+                if phi < 0:
+                    z = 0.5
+                else :
+                    z = -0.5
+                robot.setVelocity(0 ,z)
+                time.sleep(0.01)
+                if abs(phi) <0.1:
+                    robot.setVelocity(0,0)
+                    time.sleep(0.1)
+                    break
+            ###################
+            robot.setVelocity(0 ,0)
+            time.sleep(0.2)
+            robot.setGripper(20,1)
+            time.sleep(1)
             robot.setVelocity(0,0)
+            time.sleep(0.1)
             print "finish"
+            robot.setVelocity(0,0)
+            time.sleep(1.5)
+            robot.setVelocity(-0.05 ,0)
+            time.sleep(4.5)
+            robot.setVelocity(0,0)
             return 'released'
 
 
@@ -272,7 +311,7 @@ if __name__ == "__main__":
     robot = TurtleBot.TB3("sina",[0,1,2])
     robot.init_node()
     robot.printInfo()
-    
+    robot.loadParameter()
     doGateFunc(robot , "blue")
  
         

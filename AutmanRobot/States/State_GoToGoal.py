@@ -17,7 +17,8 @@ class GoToGoal(smach.State):
         self.robot.setVelocity(0,0)
         time.sleep(0.1)
 
-        result = obstacleAvoidance(self.robot , self.robot.goalPoint , 40)
+        result = obstacleAvoidance(self.robot , self.robot.goalPoint , time_out = 40 , isGoal = True)
+        
         if result == "arrived" :
             angle = 0
             time_out = 7
@@ -32,8 +33,9 @@ class GoToGoal(smach.State):
                     z = -0.5
                 self.robot.setVelocity(0 ,z)
                 time.sleep(0.001)
-                if abs(z) <0.2:
+                if abs(phi) <0.1:
                     self.robot.setVelocity(0,0)
+                    time.sleep(0.1)
                     break
             ###################
             self.robot.setVelocity(0,0)

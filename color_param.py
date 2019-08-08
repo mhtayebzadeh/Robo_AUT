@@ -72,7 +72,7 @@ while(1):
     dim = (width, height)
     resizedBGR = cv2.resize(frame, dim, interpolation =cv2.INTER_AREA)
     hsv = cv2.cvtColor(resizedBGR, cv2.COLOR_BGR2HSV)
-    hsv = cv2.blur(hsv,(11,11))
+    # hsv = cv2.blur(hsv,(11,11))
     ##########################################3
     lower_range = np.array([hmin, smin, vmin])
     upper_range = np.array([hmax, smax, vmax])

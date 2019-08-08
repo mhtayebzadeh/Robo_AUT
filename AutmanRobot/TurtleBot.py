@@ -56,8 +56,8 @@ class TB3:
     lower_red1_ball = np.array([160 , 145 , 0])
     upper_red1_ball = np.array([200 , 225 ,255])
 
-    lower_red2_ball = np.array([0 , 148 , 116])
-    upper_red2_ball = np.array([255 , 255 ,227])
+    lower_red2_ball = np.array([0 , 0 , 0])
+    upper_red2_ball = np.array([6 , 255 ,227])
 
     lower_yellow_ball = np.array([0 , 0 , 0])
     upper_yellow_ball = np.array([68 , 236 ,255])
@@ -229,25 +229,48 @@ class TB3:
         pass
 
     def loadParameter(self):
-        hmin,hmax,smin,smax,vmin,vmax = 0,0,0,0,0,0
-        with open ('./AutmanRobot/color/red.pickle','rb') as tuned_param:
-            # red=[hmin,hmax,smin,smax,vmin,vmax]
-            red=pickle.load(tuned_param)
-            [hmin,hmax,smin,smax,vmin,vmax]=red
-            self.lower_red1_ball = np.array([hmin , smin , vmin])
-            self.upper_red1_ball = np.array([hmax, smax, vmax])
-        with open ('./AutmanRobot/color/blue.pickle','rb') as tuned_param:
-            blue=[hmin,hmax,smin,smax,vmin,vmax]
-            blue=pickle.load(tuned_param)
-            [hmin,hmax,smin,smax,vmin,vmax]=blue
-            self.lower_blue_ball = np.array([hmin , smin , vmin])
-            self.upper_blue_ball = np.array([hmax, smax, vmax])
-        with open ('./AutmanRobot/color/yellow.pickle','rb') as tuned_param:
-            yellow=[hmin,hmax,smin,smax,vmin,vmax]
-            yellow=pickle.load(tuned_param)
-            [hmin,hmax,smin,smax,vmin,vmax]=yellow
-            self.lower_yellow_ball = np.array([hmin , smin , vmin])
-            self.upper_yellow_ball = np.array([hmax, smax, vmax])
+        try:
+            hmin,hmax,smin,smax,vmin,vmax = 0,0,0,0,0,0
+            with open ('./AutmanRobot/color/red.pickle','rb') as tuned_param:
+                # red=[hmin,hmax,smin,smax,vmin,vmax]
+                red=pickle.load(tuned_param)
+                [hmin,hmax,smin,smax,vmin,vmax]=red
+                self.lower_red1_ball = np.array([hmin , smin , vmin])
+                self.upper_red1_ball = np.array([hmax, smax, vmax])
+            with open ('./AutmanRobot/color/blue.pickle','rb') as tuned_param:
+                blue=[hmin,hmax,smin,smax,vmin,vmax]
+                blue=pickle.load(tuned_param)
+                [hmin,hmax,smin,smax,vmin,vmax]=blue
+                self.lower_blue_ball = np.array([hmin , smin , vmin])
+                self.upper_blue_ball = np.array([hmax, smax, vmax])
+            with open ('./AutmanRobot/color/yellow.pickle','rb') as tuned_param:
+                yellow=[hmin,hmax,smin,smax,vmin,vmax]
+                yellow=pickle.load(tuned_param)
+                [hmin,hmax,smin,smax,vmin,vmax]=yellow
+                self.lower_yellow_ball = np.array([hmin , smin , vmin])
+                self.upper_yellow_ball = np.array([hmax, smax, vmax])
+        except:
+            hmin,hmax,smin,smax,vmin,vmax = 0,0,0,0,0,0
+            with open ('/home/aut/Desktop/Robo_AUT/AutmanRobot/color/red.pickle','rb') as tuned_param:
+                # red=[hmin,hmax,smin,smax,vmin,vmax]
+                red=pickle.load(tuned_param)
+                [hmin,hmax,smin,smax,vmin,vmax]=red
+                self.lower_red1_ball = np.array([hmin , smin , vmin])
+                self.upper_red1_ball = np.array([hmax, smax, vmax])
+            with open ('/home/aut/Desktop/Robo_AUT/AutmanRobot/color/blue.pickle','rb') as tuned_param:
+                blue=[hmin,hmax,smin,smax,vmin,vmax]
+                blue=pickle.load(tuned_param)
+                [hmin,hmax,smin,smax,vmin,vmax]=blue
+                self.lower_blue_ball = np.array([hmin , smin , vmin])
+                self.upper_blue_ball = np.array([hmax, smax, vmax])
+            with open ('/home/aut/Desktop/Robo_AUT/AutmanRobot/color/yellow.pickle','rb') as tuned_param:
+                yellow=[hmin,hmax,smin,smax,vmin,vmax]
+                yellow=pickle.load(tuned_param)
+                [hmin,hmax,smin,smax,vmin,vmax]=yellow
+                self.lower_yellow_ball = np.array([hmin , smin , vmin])
+                self.upper_yellow_ball = np.array([hmax, smax, vmax])
+            
+
 
     def getOdometry(self):
         '''

@@ -18,7 +18,7 @@ def obstacleAvoidance(robot , pos_d_ = [1,1],time_out = 45 , isGoal = False):
     robot.setGripper(40)
     robot.setCameraPos(150,80)
     time.sleep(0.2)
-    pos_d = pos_d_
+    pos_d = np.array(pos_d_)
     dist_goal = 100
     robot.setRobotTime(0)
     time_ = 0
@@ -60,7 +60,7 @@ def obstacleAvoidance(robot , pos_d_ = [1,1],time_out = 45 , isGoal = False):
 
             # if (isGoal == False):
             #     ### check obstacle on the next point
-            #     landa = theta*180/np.pi - phi;
+            #     landa = theta*np.pi/180 - phi;
             #     x_estimate_obs = pos[0] + dist*np.cos(landa)  
             #     y_estimate_obs = pos[1] - dist*np.sin(landa)
 
@@ -83,8 +83,15 @@ def obstacleAvoidance(robot , pos_d_ = [1,1],time_out = 45 , isGoal = False):
         # ang = -a[2] + np.arctan2(F_total[1] , F_total[0])
         robot_vec = np.array([np.cos(phi) , np.sin(phi)] )
         ang = robot.vec_ang(F_total , robot_vec)
-        print("dist = " + str(dist_goal) + " ang = " + str(int(robot.rad2deg(ang))) + " , phi = " + str(int(phi*180/np.pi)) + " , obs phi = " + str(int(np.arctan2(F_obs[1] , F_obs[0])*180/np.pi)) )
-        # print("F_total = " + str(F_total) + " , F_goal = " + str(F_goal) + " , F_obs = " + str(F_obs))
+        try:
+            F_obs[0] = F_obs[0] + 0.0001;
+            F_obs[1] = F_obs[1] + 0.0001;
+            print("dist = " + str(dist_goal) + " ang = " + str(int(robot.rad2deg(ang))) + " , phi = " + str(int(phi*180/np.pi)) + " , obs phi = " + str(int(np.arctan2(F_obs[1] , F_obs[0])*180/np.pi)) )
+            # print("F_total = " + stself.robotr(F_total) + " , F_goal = " + str(F_goal) + " , F_obs = " + str(F_obs))    
+        except:
+            print("Exception .... ")
+            time.sleep(1)
+        
         a = np.append(F_total , 0)
         b = np.append(robot_vec , 0)
 
@@ -122,7 +129,7 @@ if __name__ == "__main__":
     robot.setVelocity(0,0)    
     robot.setGripper(0)
 
-    obstacleAvoidance(robot , [1,0])
+    obstacleAvoidance(robot , [1,0] , time_out = 30 , isGoal = True)
     #obstacleAvoidance(robot , [1,0])
     # obstacleAvoidance(robot , [2,1])
     # obstacleAvoidance(robot , [2.7,0])

@@ -122,7 +122,7 @@ def p(errorx):
 
 def doScan(robot,prefered_color = 'red',time_out=25):
     robot.setGripper(90)
-    robot.setCameraPos(105,70)
+    robot.setCameraPos(105,60)
     # t = time.time()
     ang = 0;
     frame, hsv = robot.getFrame(color = "hsv")
@@ -172,6 +172,11 @@ def doScan(robot,prefered_color = 'red',time_out=25):
         print(imu[2])
         phi = imu[2]
 ###################################################################
+        offset_angle = 0.3
+        obstacles = robot.getObstacles(minRange = 0.07 , maxRange = 0.45 , minAngle = 350 , maxAngle = 10)
+        if len(obstacles) > 0:
+            continue 
+
         if (ball_red==1):
             print("ball RED detected")
             if(len(ball_red_arr)==0 or (abs(ball_red_arr[-1] - phi) > 0.2 and abs(ball_red_arr[-1] - phi)<6.1)):
@@ -198,12 +203,12 @@ def doScan(robot,prefered_color = 'red',time_out=25):
             else:
                 ball_blue_arr[-1] = phi
                 ball_blue_arr_num[-1] = ball_blue_arr_num[-1] + 1
-            ball_red_arr = [i-np.sign(rotation_velocity)*0.4 for i in ball_red_arr] ## corection of detected ball angle
+            ball_red_arr = [i-np.sign(rotation_velocity)*offset_angle for i in ball_red_arr] ## corection of detected ball angle
 
         arr_dict = {'red':ball_red_arr , 'yellow':ball_yellow_arr , 'blue':ball_blue_arr }
         arr_num_dict = {'red':ball_red_arr_num , 'yellow':ball_yellow_arr_num , 'blue':ball_blue_arr_num }
 
-        if ((abs(phi - init_phi) < 0.15 and t-tt > 5)or (len(arr_dict[prefered_color])>0 and max(arr_num_dict[prefered_color])>7)):
+        if ((abs(phi - init_phi) < 0.15 and t-tt > 5)or (len(arr_dict[prefered_color])>0 and max(arr_num_dict[prefered_color])>10)):
             print("end")
             robot.setVelocity(0,0)
             break
@@ -211,29 +216,30 @@ def doScan(robot,prefered_color = 'red',time_out=25):
         # cv2.imshow("Frame",frame)
         # k=cv2.waitKey(1) & 0xFF
 
-    ball_red_arr = [i-np.sign(rotation_velocity)*0.4 for i in ball_red_arr] ## corection of detected ball angle
+    
+    ball_red_arr = [i-np.sign(rotation_velocity)*offset_angle for i in ball_red_arr] ## corection of detected ball angle
     print(ball_red_arr)
     print(ball_red_arr_num)
     ball_red_detected = None
-    if (len(ball_red_arr)>0 and max(ball_red_arr_num)>7):
+    if (len(ball_red_arr)>0 and max(ball_red_arr_num)>8):
         ball_red_detected = ball_red_arr[ball_red_arr_num.index(max(ball_red_arr_num))]
         # time.sleep(0.1)
     print(ball_red_detected)
 
-    ball_yellow_arr = [i-np.sign(rotation_velocity)*0.4 for i in ball_yellow_arr] ## corection of detected ball angle
+    ball_yellow_arr = [i-np.sign(rotation_velocity)*offset_angle for i in ball_yellow_arr] ## corection of detected ball angle
     print(ball_yellow_arr)
     print(ball_yellow_arr_num)
     ball_yellow_detected = None
-    if (len(ball_yellow_arr)>0 and max(ball_yellow_arr_num)>7):
+    if (len(ball_yellow_arr)>0 and max(ball_yellow_arr_num)>8):
         ball_yellow_detected = ball_yellow_arr[ball_yellow_arr_num.index(max(ball_yellow_arr_num))]
         # time.sleep(0.1)
     print(ball_yellow_detected)
 
-    ball_blue_arr = [i-np.sign(rotation_velocity)*0.4 for i in ball_blue_arr] ## corection of detected ball angle
+    ball_blue_arr = [i-np.sign(rotation_velocity)*offset_angle for i in ball_blue_arr] ## corection of detected ball angle
     print(ball_blue_arr)
     print(ball_blue_arr_num)
     ball_blue_detected = None
-    if (len(ball_blue_arr)>0 and max(ball_blue_arr_num)>7):
+    if (len(ball_blue_arr)>0 and max(ball_blue_arr_num)>8):
         ball_blue_detected = ball_blue_arr[ball_blue_arr_num.index(max(ball_blue_arr_num))]
         # time.sleep(0.1)
     print(ball_blue_detected)
